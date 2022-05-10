@@ -1794,7 +1794,7 @@ UIS.InputBegan:Connect(function(Key)
         end
 end
 end)
-UIS.InputEnded:Connect(function(Key --[[Typing]])
+UIS.InputEnded:Connect(function(Key)
     if not (UIS:GetFocusedTextBox()) then
         if Key.KeyCode == Enum.KeyCode.W then 
             KeysTable["W"] = false 
@@ -2550,17 +2550,18 @@ Uis.InputEnded:Connect(function(Key)
        CBar.Visible = false -- Dont mind this
    end
 end)
-local executed = true
 
 if executed == true then 
 local name = game.Players.LocalPlayer.Name
+
+ local LoadingTime = tick();
+local name = game.Players.LocalPlayer.Name
     game:GetService("StarterGui"):SetCore("SendNotification",{
-        Title = "DevPanel";
-        Text = ""..name.." Has Executed The Script";
+        Title = title;
+        Text = text;
         Icon = Icon;
     }) 
 end
-    local LoadingTime = tick();
 local Commands, Prefix = {}, ""
 getgenv().Notify = function(title, text, icon, time)
     game:GetService("StarterGui"):SetCore("SendNotification",{
