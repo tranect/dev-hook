@@ -2552,7 +2552,6 @@ Uis.InputEnded:Connect(function(Key)
 end)
 
 if executed == true then 
-local name = game.Players.LocalPlayer.Name
 
 local name = game.Players.LocalPlayer.Name
     game:GetService("StarterGui"):SetCore("SendNotification",{
