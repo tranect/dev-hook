@@ -2554,7 +2554,6 @@ end)
 if executed == true then 
 local name = game.Players.LocalPlayer.Name
 
- local LoadingTime = tick();
 local name = game.Players.LocalPlayer.Name
     game:GetService("StarterGui"):SetCore("SendNotification",{
         Title = title;
