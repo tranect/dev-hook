@@ -92,39 +92,7 @@ local Aim2 = AimbotTabbox2:AddTab("Target")
 Aim2:AddDropdown("players", {Text = "Players", Default = 1, Values = playas})
 
 local AimbotTabbox2 = AimTab:AddLeftTabbox("Silent Aim")
-do
-    local Main = AimbotTabbox2:AddTab("Silent Aim (may not work)")
-    Main:AddToggle("aim_Enabled", {Text = "Enabled"})
-    Main:AddToggle("TeamCheck", {Text = "Team Check"})
-    Main:AddToggle("VisibleCheck", {Text = "Visible Check"})
-    Main:AddDropdown("TargetPart", {Text = "Target Part", Default = 1, Values = {
-        "Head", "HumanoidRootPart", "Random"
-    }})
-    Main:AddDropdown("Method", {Text = "Silent Aim Method", Default = 1, Values = {
-        "Raycast","FindPartOnRay",
-        "FindPartOnRayWithWhitelist",
-        "FindPartOnRayWithIgnoreList",
-        "Mouse.Hit/Target"
-    }})
-end
-local FieldOfViewBOX = AimTab:AddLeftTabbox("Field Of View")
-local MiscellaneousBOX = AimTab:AddLeftTabbox("Miscellaneous")
 
-do
-    local Main = FieldOfViewBOX:AddTab("Field Of View")
-    Main:AddToggle("VisibleCheck", {Text = "Visible Check"})
-    Main:AddToggle("fov_Enabled", {Text = "Enabled"})
-    Main:AddSlider("Radius", {Text = "Radius", Min = 0, Max = 360, Default = 180, Rounding = 0}):OnChanged(function()
-    end)
-    Main:AddToggle("Visible", {Text = "Visible"}):AddColorPicker("Color", {Default = Color3.fromRGB(54, 57, 241)}):OnChanged(function()
-    end)
-    Main:AddToggle("MousePosition", {Text = "Show Fake Mouse Position"}):AddColorPicker("MouseVisualizeColor", {Default = Color3.fromRGB(54, 57, 241)}):OnChanged(function()
-    end)
-    local PredictionTab = MiscellaneousBOX:AddTab("Prediction")
-    PredictionTab:AddToggle("Prediction", {Text = "Mouse.Hit/Target Prediction"})
-    PredictionTab:AddSlider("Amount", {Text = "Prediction Amount", Min = 0.165, Max = 1, Default = 0.165, Rounding = 3}):OnChanged(function()
-end)
-end
 local VisTabbox1 = VisTab:AddLeftTabbox("Enemy ESP")
 local Esp1 = VisTabbox1:AddTab("Enemy ESP")
 Esp1:AddToggle("name_tags", {Text = "Nametags"}):AddColorPicker("nameColor", { Default = Color3.fromRGB(255, 255, 255) })
@@ -2010,19 +1978,6 @@ local function getPositionOnScreen(Vector)
     return Vector2.new(Vec3.X, Vec3.Y), OnScreen
 end
 
-local function ValidateArguments(Args, RayMethod)
-    local Matches = 0
-    if #Args < RayMethod.ArgCountRequired then
-        return false
-    end
-    for Pos, Argument in next, Args do
-        if typeof(Argument) == RayMethod.Args[Pos] then
-            Matches = Matches + 1
-        end
-    end
-    return Matches >= RayMethod.ArgCountRequired
-end
-
 local function getDirection(Origin, Position)
     return (Position - Origin).Unit * 1000
 end
@@ -2078,7 +2033,37 @@ local function getClosestPlayer()
     return Closest
 end
 
+do
+    local Main = AimbotTabbox2:AddTab("Silent Aim (may not work)")
+    Main:AddToggle("aim_Enabled", {Text = "Enabled"})
+    Main:AddToggle("TeamCheck", {Text = "Team Check"})
+    Main:AddDropdown("TargetPart", {Text = "Target Part", Default = 1, Values = {
+        "Head", "HumanoidRootPart", "Random"
+    }})
+    Main:AddDropdown("Method", {Text = "Silent Aim Method", Default = 1, Values = {
+                "Mouse.Hit/Target"
+    }})
+end
+
+local FieldOfViewBOX = AimTab:AddLeftTabbox("Field Of View")
+local MiscellaneousBOX = AimTab:AddLeftTabbox("Miscellaneous")
 local fov_circle = Drawing.new("Circle")
+do
+    local Main = FieldOfViewBOX:AddTab("Field Of View")
+    Main:AddToggle("VisibleCheck", {Text = "Visible Check"})
+    Main:AddToggle("fov_Enabled", {Text = "Enabled"})
+    Main:AddSlider("Radius", {Text = "Radius", Min = 0, Max = 360, Default = 180, Rounding = 0}):OnChanged(function()
+    fov_circle.Radius = Options.Radius.Value
+    end)
+    Main:AddToggle("Visible", {Text = "Visible"}):AddColorPicker("Color", {Default = Color3.fromRGB(255, 255, 255)})
+
+    Main:AddToggle("MousePosition", {Text = "Show Fake Mouse Position"}):AddColorPicker("MouseVisualizeColor", {Default = Color3.fromRGB(255, 255, 255)})
+
+    local PredictionTab = MiscellaneousBOX:AddTab("Prediction")
+    PredictionTab:AddToggle("Prediction", {Text = "Mouse.Hit/Target Prediction"})
+    PredictionTab:AddSlider("Amount", {Text = "Prediction Amount", Min = 0.165, Max = 1, Default = 0.165, Rounding = 3})
+end
+
 fov_circle.Thickness = 1
 fov_circle.NumSides = 100
 fov_circle.Radius = Options.Radius.Value
@@ -2086,15 +2071,16 @@ fov_circle.Filled = false
 fov_circle.Visible = Toggles.Visible.Value
 fov_circle.ZIndex = 999
 fov_circle.Transparency = 1
-fov_circle.Color = Color3.fromRGB(54, 57, 241)
+fov_circle.Color = Color3.fromRGB(255, 255, 255)
     
 local mouse_box = Drawing.new("Square")
 mouse_box.Visible = Toggles.MousePosition.Value 
 mouse_box.ZIndex = 999 
-mouse_box.Color = Color3.fromRGB(54, 57, 241)
+mouse_box.Color = Color3.fromRGB(255, 255, 255)
 mouse_box.Thickness = 20 
-mouse_box.Size = Vector2.new(20, 20)
-mouse_box.Filled = true 
+mouse_box.Size = Vector2.new(19, 19)
+mouse_box.Filled = false 
+mouse_box.Transparency = 0.5
 
 local PredictionAmount = Options.Amount.Value
 
@@ -2116,96 +2102,6 @@ resume(create(function()
         end
     end)
 end))
-
-local ExpectedArguments = {
-    FindPartOnRayWithIgnoreList = {
-        ArgCountRequired = 3,
-        Args = {
-            "Instance", "Ray", "table", "boolean", "boolean"
-        }
-    },
-    FindPartOnRayWithWhitelist = {
-        ArgCountRequired = 3,
-        Args = {
-            "Instance", "Ray", "table", "boolean"
-        }
-    },
-    FindPartOnRay = {
-        ArgCountRequired = 2,
-        Args = {
-            "Instance", "Ray", "Instance", "boolean", "boolean"
-        }
-    },
-    Raycast = {
-        ArgCountRequired = 3,
-        Args = {
-            "Instance", "Vector3", "Vector3", "RaycastParams"
-        }
-    }
-}
-
-local oldNamecall
-oldNamecall = hookmetamethod(game, "__namecall", function(...)
-    local Method = getnamecallmethod()
-    local Arguments = {...}
-    local self = Arguments[1]
-
-    if Toggles.aim_Enabled.Value and self == workspace then
-        if Method == "FindPartOnRayWithIgnoreList" and Options.Method.Value == Method then
-            if ValidateArguments(Arguments, ExpectedArguments.FindPartOnRayWithIgnoreList) then
-                local A_Ray = Arguments[2]
-
-                local HitPart = getClosestPlayer()
-                if HitPart then
-                    local Origin = A_Ray.Origin
-                    local Direction = getDirection(Origin, HitPart.Position)
-                    Arguments[2] = Ray.new(Origin, Direction)
-
-                    return oldNamecall(unpack(Arguments))
-                end
-            end
-        elseif Method == "FindPartOnRayWithWhitelist" and Options.Method.Value == Method then
-            if ValidateArguments(Arguments, ExpectedArguments.FindPartOnRayWithWhitelist) then
-                local A_Ray = Arguments[2]
-
-                local HitPart = getClosestPlayer()
-                if HitPart then
-                    local Origin = A_Ray.Origin
-                    local Direction = getDirection(Origin, HitPart.Position)
-                    Arguments[2] = Ray.new(Origin, Direction)
-
-                    return oldNamecall(unpack(Arguments))
-                end
-            end
-        elseif (Method == "FindPartOnRay" or Method == "findPartOnRay") and Options.Method.Value:lower() == Method:lower() then
-            if ValidateArguments(Arguments, ExpectedArguments.FindPartOnRay) then
-                local A_Ray = Arguments[2]
-
-                local HitPart = getClosestPlayer()
-                if HitPart then
-                    local Origin = A_Ray.Origin
-                    local Direction = getDirection(Origin, HitPart.Position)
-                    Arguments[2] = Ray.new(Origin, Direction)
-
-                    return oldNamecall(unpack(Arguments))
-                end
-            end
-        elseif Method == "Raycast" and Options.Method.Value == Method then
-            if ValidateArguments(Arguments, ExpectedArguments.Raycast) then
-                local A_Origin = Arguments[2]
-
-                local HitPart = getClosestPlayer()
-                if HitPart then
-                    Arguments[3] = getDirection(A_Origin, HitPart.Position)
-
-                    return oldNamecall(unpack(Arguments))
-                end
-            end
-        end
-    end
-    return oldNamecall(...)
-end)
-
 local oldIndex = nil 
 oldIndex = hookmetamethod(game, "__index", function(self, Index)
     if self == Mouse and (Index == "Hit" or Index == "Target") then 
